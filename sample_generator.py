@@ -7,6 +7,9 @@ import os
 import shutil
 from PIL import Image
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DEFAULT_PRESET_DIR = os.path.join(BASE_DIR, "assets", "presets")
+
 PRESET_FILES = [
     "clustered_bph.jpg",
     "camouflaged_leafroller.jpg",
@@ -14,11 +17,13 @@ PRESET_FILES = [
     "multiclass_field.jpg"
 ]
 
-def generate_preset_images(output_dir="assets/presets") -> dict:
+def generate_preset_images(output_dir=None) -> dict:
     """
     Ensures the 4 authentic real insect preset images are present in output_dir.
     Returns: dict mapping case_id -> absolute file path.
     """
+    if output_dir is None:
+        output_dir = DEFAULT_PRESET_DIR
     os.makedirs(output_dir, exist_ok=True)
     mapping = {
         "clustered_bph": os.path.join(output_dir, "clustered_bph.jpg"),
@@ -30,11 +35,9 @@ def generate_preset_images(output_dir="assets/presets") -> dict:
     # Verify that each exists and is 640x640
     for case_id, path in mapping.items():
         if not os.path.exists(path):
-            # Create a clean fallback 640x640 image if missing
             img = Image.new("RGB", (640, 640), color=(50, 90, 45))
             img.save(path, quality=95)
         else:
-            # Ensure 640x640
             with Image.open(path) as im:
                 if im.size != (640, 640):
                     im_resized = im.resize((640, 640), Image.Resampling.LANCZOS)

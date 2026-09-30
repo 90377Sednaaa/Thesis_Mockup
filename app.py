@@ -253,7 +253,7 @@ st.markdown("""
 # ---------------------------------------------------------
 # Preset Photographic Images Setup
 # ---------------------------------------------------------
-preset_paths = generate_preset_images("assets/presets")
+preset_paths = generate_preset_images()
 
 # ---------------------------------------------------------
 # Sidebar Configuration Controls
