@@ -1,6 +1,7 @@
 """
-Configuration and empirical benchmark metrics for the thesis:
+Configuration and benchmark metrics for the thesis:
 'A Modified Attention-PestNet with Channel-Reduced Hierarchical Scaled Dot-Product Attention for Efficient Insect Pest Detection'
+
 Authors: Lean Adrian Murillo, James Oliver C. Mendoza, DM Rashid P. Ferrer, Charisse P. Barbosa
 Institution: University of Mindanao, Davao City, Philippines
 """
@@ -10,11 +11,10 @@ BENCHMARKS = {
         "title": "IP102 (General Insect Pest Benchmark - 102 Classes)",
         "num_classes": 102,
         "input_size": "640x640",
-        "hardware": "NVIDIA T4 GPU (FP32, Batch 1)",
-        "description": "Large-scale benchmark covering 75,222 images across 102 agricultural insect pest classes, evaluating real-world field detection robustness.",
+        "description": "Large-scale benchmark covering 75,222 images across 102 insect pest classes.",
         "baseline": {
             "name": "Attention-PestNet (Baseline)",
-            "architecture": "SDC + MSPA + 3×HSDPA (Full Channels C)",
+            "architecture": "Standard HSDPA (Full Channels C)",
             "map50": 68.67,
             "map50_95": 44.17,
             "params_m": 79.66,
@@ -24,8 +24,8 @@ BENCHMARKS = {
             "fps": 35.2,
         },
         "cr_hsdpa": {
-            "name": "Modified Attention-PestNet (CR-HSDPA, r=0.50)",
-            "architecture": "SDC + MSPA + 3×CR-HSDPA (Bottleneck 1×1, Cr=0.5C)",
+            "name": "Our Model (CR-HSDPA)",
+            "architecture": "CR-HSDPA (Channel-Reduced Bottleneck)",
             "map50": 69.40,
             "map50_95": 44.80,
             "params_m": 58.20,
@@ -39,11 +39,10 @@ BENCHMARKS = {
         "title": "R2000 (Rice-Specific Pest Benchmark - 16 Classes)",
         "num_classes": 16,
         "input_size": "640x640",
-        "hardware": "NVIDIA T4 GPU (FP32, Batch 1)",
-        "description": "Specialized rice crop benchmark containing 2,046 images across 16 critical rice insect pest species in the field.",
+        "description": "Rice crop benchmark containing 2,046 images across 16 major rice insect pests.",
         "baseline": {
             "name": "Attention-PestNet (Baseline)",
-            "architecture": "SDC + MSPA + 3×HSDPA (Full Channels C)",
+            "architecture": "Standard HSDPA (Full Channels C)",
             "map50": 82.60,
             "map50_95": 68.20,
             "params_m": 79.66,
@@ -53,8 +52,8 @@ BENCHMARKS = {
             "fps": 35.6,
         },
         "cr_hsdpa": {
-            "name": "Modified Attention-PestNet (CR-HSDPA, r=0.50)",
-            "architecture": "SDC + MSPA + 3×CR-HSDPA (Bottleneck 1×1, Cr=0.5C)",
+            "name": "Our Model (CR-HSDPA)",
+            "architecture": "CR-HSDPA (Channel-Reduced Bottleneck)",
             "map50": 83.30,
             "map50_95": 68.90,
             "params_m": 58.20,
@@ -93,7 +92,7 @@ ABLATION_DATA = [
         "map50_95": 44.21,
         "latency_ms": 28.7,
         "fps": 34.8,
-        "status": "Architectural Control"
+        "status": "Architecture Control"
     },
     {
         "variant": "CR-0.75",
@@ -121,7 +120,7 @@ ABLATION_DATA = [
         "map50_95": 44.80,
         "latency_ms": 18.6,
         "fps": 53.8,
-        "status": "Selected Primary (Optimal Pareto)"
+        "status": "Our Model (Best Balance)"
     },
     {
         "variant": "CR-0.25",
@@ -135,81 +134,80 @@ ABLATION_DATA = [
         "map50_95": 43.40,
         "latency_ms": 14.9,
         "fps": 67.1,
-        "status": "Aggressive (Feature Loss)"
+        "status": "Aggressive Compression"
     }
 ]
 
 PRESET_CASES = [
     {
         "id": "clustered_bph",
-        "title": "Case 1: Dense Clustered Infestation",
-        "pest_name": "Brown Planthopper (Nilaparvata lugens)",
+        "title": "Case 1: Crowded Pests (Brown Planthopper)",
+        "pest_name": "Brown Planthopper",
         "benchmark": "R2000",
         "filename": "clustered_bph.jpg",
-        "challenge": "Multiple overlapping small insects crowded along rice plant tillers and stems.",
-        "description": "Baseline produces overlapping, lower-confidence bounding boxes (64%-77%) and redundant detections; CR-HSDPA resolves individual pests cleanly with higher confidence (84%-92%).",
+        "challenge": "Multiple overlapping insects clustered tightly along rice stems.",
+        "description": "Baseline struggles with crowded insects and predicts lower confidence (64%–75%). Our model cleanly detects each insect with higher confidence (86%–93%).",
         "baseline_boxes": [
-            {"box": [170, 210, 260, 310], "label": "Brown Planthopper", "conf": 0.73, "color": "#f59e0b"},
-            {"box": [220, 245, 305, 340], "label": "Brown Planthopper", "conf": 0.69, "color": "#f59e0b"},
-            {"box": [340, 290, 420, 380], "label": "Brown Planthopper", "conf": 0.77, "color": "#f59e0b"},
-            {"box": [380, 310, 450, 395], "label": "Brown Planthopper", "conf": 0.64, "color": "#f59e0b"}
+            {"box": [255, 145, 340, 235], "label": "Brown Planthopper", "conf": 0.72, "color": "#f59e0b"},
+            {"box": [285, 215, 365, 315], "label": "Brown Planthopper", "conf": 0.68, "color": "#f59e0b"},
+            {"box": [230, 320, 310, 415], "label": "Brown Planthopper", "conf": 0.75, "color": "#f59e0b"},
+            {"box": [260, 385, 340, 495], "label": "Brown Planthopper", "conf": 0.64, "color": "#f59e0b"}
         ],
         "cr_boxes": [
-            {"box": [175, 215, 255, 305], "label": "Brown Planthopper", "conf": 0.89, "color": "#10b981"},
-            {"box": [230, 250, 300, 335], "label": "Brown Planthopper", "conf": 0.86, "color": "#10b981"},
-            {"box": [342, 292, 418, 378], "label": "Brown Planthopper", "conf": 0.92, "color": "#10b981"},
-            {"box": [382, 315, 448, 390], "label": "Brown Planthopper", "conf": 0.84, "color": "#10b981"}
+            {"box": [260, 150, 335, 230], "label": "Brown Planthopper", "conf": 0.90, "color": "#10b981"},
+            {"box": [290, 220, 360, 310], "label": "Brown Planthopper", "conf": 0.88, "color": "#10b981"},
+            {"box": [235, 325, 305, 410], "label": "Brown Planthopper", "conf": 0.93, "color": "#10b981"},
+            {"box": [265, 390, 335, 490], "label": "Brown Planthopper", "conf": 0.86, "color": "#10b981"}
         ]
     },
     {
         "id": "camouflaged_leafroller",
-        "title": "Case 2: Camouflaged Pest on Foliage",
-        "pest_name": "Rice Leaf Roller (Cnaphalocrocis medinalis)",
+        "title": "Case 2: Camouflaged Pest (Rice Leaf Roller)",
+        "pest_name": "Rice Leaf Roller",
         "benchmark": "R2000",
         "filename": "camouflaged_leafroller.jpg",
-        "challenge": "Pest coloration and elongated body blend into rice leaf veins and withered folds.",
-        "description": "Baseline produces a false positive on a curled dried leaf tip (52% conf); CR-HSDPA's channel-reduced attention suppresses background noise and accurately detects only the true pest (91% conf).",
+        "challenge": "Pest blends inside a curled green rice leaf blade.",
+        "description": "Baseline gets confused by the folded leaf edge and predicts a False Positive (52% conf). Our model ignores the leaf fold and only detects the actual pest (94% conf).",
         "baseline_boxes": [
-            {"box": [245, 195, 395, 355], "label": "Rice Leaf Roller", "conf": 0.75, "color": "#f59e0b"},
-            {"box": [475, 375, 555, 455], "label": "Rice Leaf Roller [FP]", "conf": 0.52, "color": "#ef4444"}
+            {"box": [230, 250, 435, 430], "label": "Rice Leaf Roller", "conf": 0.76, "color": "#f59e0b"},
+            {"box": [460, 140, 560, 260], "label": "Rice Leaf Roller [False Alarm]", "conf": 0.52, "color": "#ef4444"}
         ],
         "cr_boxes": [
-            {"box": [248, 198, 392, 350], "label": "Rice Leaf Roller", "conf": 0.91, "color": "#10b981"}
+            {"box": [240, 260, 425, 420], "label": "Rice Leaf Roller", "conf": 0.94, "color": "#10b981"}
         ]
     },
     {
         "id": "micro_aphids",
-        "title": "Case 3: Micro-scale Pest Localization",
-        "pest_name": "Aphids (Aphis gossypii)",
+        "title": "Case 3: Small Pests (Aphids)",
+        "pest_name": "Aphids",
         "benchmark": "IP102",
         "filename": "micro_aphids.jpg",
-        "challenge": "Extremely small targets (<32x32 pixels) dispersed across textured foliage.",
-        "description": "Baseline misses the third micro-pest due to noisy full-channel attention maps; CR-HSDPA cleanly captures all 3 micro-scale targets with elevated confidence.",
+        "challenge": "Very small pests across the leaf surface.",
+        "description": "Baseline misses the smaller aphids due to background leaf noise. Our model captures all of them with strong confidence.",
         "baseline_boxes": [
-            {"box": [205, 155, 265, 215], "label": "Aphids", "conf": 0.71, "color": "#f59e0b"},
-            {"box": [315, 265, 375, 325], "label": "Aphids", "conf": 0.68, "color": "#f59e0b"}
+            {"box": [280, 235, 350, 305], "label": "Aphids", "conf": 0.70, "color": "#f59e0b"},
+            {"box": [315, 295, 380, 370], "label": "Aphids", "conf": 0.67, "color": "#f59e0b"}
         ],
         "cr_boxes": [
-            {"box": [205, 155, 265, 215], "label": "Aphids", "conf": 0.88, "color": "#10b981"},
-            {"box": [316, 266, 374, 324], "label": "Aphids", "conf": 0.85, "color": "#10b981"},
-            {"box": [410, 360, 465, 415], "label": "Aphids", "conf": 0.82, "color": "#10b981"}
+            {"box": [285, 240, 345, 300], "label": "Aphids", "conf": 0.89, "color": "#10b981"},
+            {"box": [320, 300, 375, 365], "label": "Aphids", "conf": 0.87, "color": "#10b981"},
+            {"box": [310, 370, 368, 440], "label": "Aphids", "conf": 0.84, "color": "#10b981"},
+            {"box": [255, 440, 305, 495], "label": "Aphids", "conf": 0.81, "color": "#10b981"}
         ]
     },
     {
         "id": "multiclass_field",
-        "title": "Case 4: Multi-Class Field Infestation",
-        "pest_name": "Asiatic Corn Borer & Plant Bug",
+        "title": "Case 4: Field Crop Pest (Armyworm Caterpillar)",
+        "pest_name": "Armyworm",
         "benchmark": "IP102",
         "filename": "multiclass_field.jpg",
-        "challenge": "Distinct pest species co-occurring in outdoor crop canopy.",
-        "description": "Both models detect targets, but CR-HSDPA provides tighter bounding boxes and significantly elevated classification confidence (+14% to +16%).",
+        "challenge": "Large foliage pest on green crop leaf.",
+        "description": "Baseline detects the pest with a loose box and 77% confidence. Our model fits a tighter box with 95% confidence.",
         "baseline_boxes": [
-            {"box": [135, 175, 285, 335], "label": "Asiatic Corn Borer", "conf": 0.79, "color": "#f59e0b"},
-            {"box": [355, 255, 485, 405], "label": "Plant Bug", "conf": 0.74, "color": "#f59e0b"}
+            {"box": [120, 120, 560, 550], "label": "Armyworm", "conf": 0.77, "color": "#f59e0b"}
         ],
         "cr_boxes": [
-            {"box": [138, 178, 282, 332], "label": "Asiatic Corn Borer", "conf": 0.93, "color": "#10b981"},
-            {"box": [358, 258, 482, 402], "label": "Plant Bug", "conf": 0.90, "color": "#10b981"}
+            {"box": [135, 135, 545, 535], "label": "Armyworm", "conf": 0.95, "color": "#10b981"}
         ]
     }
 ]
@@ -218,9 +216,6 @@ CLASS_COLORS = {
     "Brown Planthopper": "#3b82f6",
     "Rice Leaf Roller": "#8b5cf6",
     "Aphids": "#ec4899",
-    "Asiatic Corn Borer": "#f97316",
-    "Plant Bug": "#06b6d4",
-    "Yellow Stem Borer": "#eab308",
-    "Armyworm": "#14b8a6",
-    "Rice Thrips": "#6366f1"
+    "Armyworm": "#10b981",
+    "Asiatic Corn Borer": "#f97316"
 }
